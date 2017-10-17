@@ -15,7 +15,7 @@ import (
 )
 
 var Debug *bool = flag.Bool("debug", true, "Are you debug?")
-var Server *string = flag.String("server", "", "服务类型 (无/http/cli) ?")
+var Server *string = flag.String("server", "all", "服务类型 (all/http/task/sentinel) ?")
 var Port *string = flag.String("port", "8888", "http服务端口，8888")
 var Process *string = flag.String("process", "1", "process member ?")
 var Redishost *string = flag.String("redishost", "localhost:6379", "redis ip:端口 ?")
@@ -50,17 +50,26 @@ func main() {
 
 	case "http":
 		/**
-		 * 启动http server
+		 * 启动http server任务接收、后台管理web
 		 */
 		lib.Server_http(Params)
 
-	case "cli":
+	case "task":
 		/**
-		 * 启动脚本服务
+		 * 启动脚本服务主进程
 		 */
-		lib.Server_cli(Params)
+		lib.Server_task(Params)
 
-	default:
+    case "sentinel":
+        /**
+         * 用于监听 
+         * 任务执行状态 业务 （供查询）
+         * 任务子进程的状态（根据pid）
+         * 
+         */
+        
+
+	case "all":
 		/**
 		 * 启动所有服务
 		 */
@@ -74,7 +83,7 @@ func main() {
 		Params = lib.Load_json_conf(Params)
 
 		run_http := fmt.Sprintf("%s %s -server=http", path, Params["paramsStr"])
-		run_cli := fmt.Sprintf("%s %s -server=cli", path, Params["paramsStr"])
+		run_task := fmt.Sprintf("%s %s -server=task", path, Params["paramsStr"])
 
 		out_c1 := make(chan string)
 		out_c2 := make(chan string)
@@ -88,13 +97,13 @@ func main() {
 		}()
 
 		go func() {
-			out, err := lib.Run_shell(run_cli)
+			out, err := lib.Run_shell(run_task)
 			out_c2 <- out
 			err_c2 <- err
 		}()
 
 		fmt.Println("Run http:", run_http, "\n", <-out_c1, <-err_c1, ".\n")
-		fmt.Println("Run cli:", run_cli, "\n", <-out_c2, <-err_c2, ".\n")
+		fmt.Println("Run task:", run_task, "\n", <-out_c2, <-err_c2, ".\n")
 	}
 
 	if *Debug == true {

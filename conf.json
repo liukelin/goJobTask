@@ -1,4 +1,24 @@
 {
-"conf":""
+    "conf":"",
+    "http_port":"8888",
+
+    "task_process":1,
+
+    "debug":0,
+
+    "sentinel_time":3,
+
+    "redis":"localhost:6379",
+    "redis_db":0,
+
+    // 任务脚本路径
+    "task_script_file":"",
+
+    "shell_cli":    "/bin/sh",
+    "php_cli":      "/usr/bin/php7.0",
+    "java_cli":     "/usr/bin/java",
+    "python2_cli":  "/usr/bin/python2",
+    "python3_cli":  "/usr/bin/python3",
+
 
 }

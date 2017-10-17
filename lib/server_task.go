@@ -26,48 +26,21 @@ var Rerr error
  * 后台脚本server 入口
  * @return {[type]} [description]
  */
-func Server_cli(params map[string]string) {
+func Server_task(params map[string]string) {
 
 	// string to int
 	redisdb, err0 := strconv.Atoi(params["redisdb"])
 	if err0 != nil {
 		redisdb = 0
 	}
-	RConn, Rerr = RedisClient(params["redishost"], params["redispass"], redisdb)
+	// RConn, Rerr = RedisClient(params["redishost"], params["redispass"], redisdb)
 
-	if Rerr == nil {
+	// if Rerr == nil {
 
 		// 按CPU核数 设置并行数量
 		runtime.GOMAXPROCS(runtime.NumCPU())
 
 		for {
-			// err := rConn.RPsh("RedisKey", "value").Err()
-			d, err := RConn.LPop(RedisKey).Result()
-
-			// fmt.Println(time.Now(), " Lpop.")
-
-			// 判断重连
-			if err != nil {
-				if err == redis.Nil {
-					// fmt.Println(time.Now(), " does not exists:", err)
-				} else {
-					fmt.Println(time.Now(), "Redis connection error:", err, reflect.TypeOf(err), ".\n")
-					RConn, Rerr = RedisClient(params["redishost"], params["redispass"], redisdb)
-				}
-
-				//将CPU时间片让给其它goroutine
-				// runtime.Gosched()
-
-			} else {
-				if len(d) > 0 {
-					fmt.Println(time.Now(), " - redis LPop:", reflect.TypeOf(d), d, int(time.Second), ".\n")
-					// defer RConn.Close()
-					go func() {
-						ack := consu_data(d)
-						fmt.Println(time.Now(), " results:", ack)
-					}()
-				}
-			}
 
 			// 阻塞 2s
 			// time.Sleep(time.Second * 2)
@@ -78,7 +51,7 @@ func Server_cli(params map[string]string) {
 			// 非阻塞
 			// time.After(time.Second + 10)
 			continue
-		}
+		// }
 
 	} else {
 		fmt.Println("Redis connection error.\n")

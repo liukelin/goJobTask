@@ -29,13 +29,7 @@ func Server_http(params map[string]string) {
 
 	Params = params
 
-	redisdb, err0 := strconv.Atoi(params["redisdb"])
-	if err0 != nil {
-		redisdb = 0
-	}
-	RConn0, Rerr0 = RedisClient(params["redishost"], params["redispass"], redisdb)
-
-	if Rerr0 == nil {
+	// if Rerr0 == nil {
 
 		http.HandleFunc("/", server_http_action)
 
@@ -51,7 +45,7 @@ func Server_http(params map[string]string) {
 			log.Fatal("ListenAndServe: ", err)
 		}
 		// go mux.Run()
-	}
+	// }
 	fmt.Println("RedisClient connection error.\n")
 }
 
@@ -75,27 +69,7 @@ func server_http_action(w http.ResponseWriter, r *http.Request) {
 	} else {
 
 		fmt.Println(time.Now(), "body:", r.Form)
-
-		err := RConn0.RPush(RedisKey, d).Err()
-
-		// 判断重连
-		if err != nil {
-			redisdb, err0 := strconv.Atoi(Params["redisdb"])
-			if err0 != nil {
-				redisdb = 0
-			}
-			RConn0, Rerr0 = RedisClient(Params["redishost"], Params["redispass"], redisdb)
-			if Rerr0 == nil {
-				fmt.Println("RedisClient connection error2.\n")
-				fmt.Fprintf(w, "RedisClient connection error2.")
-			} else {
-				fmt.Println("redis RPush error:", err)
-				fmt.Fprintf(w, "redis RPush error.")
-			}
-		} else {
-			fmt.Fprintf(w, "success.")
-			// io.WriteString(w, "success.")
-		}
+		fmt.Fprintf(w, "success.")
 	}
 
 }
