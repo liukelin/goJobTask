@@ -19,33 +19,30 @@ import (
 
 var RConn0 *redis.Client
 var Rerr0 error
-var Params map[string]string
+var Params *Configuration
 
 /**
  * web server 入口
  * @return {[type]} [description]
  */
-func Server_http(params map[string]string) {
+func Server_http(params *Configuration) {
 
 	Params = params
 
-	// if Rerr0 == nil {
+	http.HandleFunc("/", server_http_action)
 
-		http.HandleFunc("/", server_http_action)
+	// strconv.Itoa(port)
+	portStr := ":" + strconv.Itoa(params.http_port)
 
-		// strconv.Itoa(port)
-		portStr := ":" + params["port"]
+	fmt.Println("your portStr is:", portStr, "\n")
 
-		fmt.Println("your portStr is:", portStr, "\n")
-
-		// mux := http.NewServeMux()
-		// err := http.ListenAndServe(portStr, mux)
-		err := http.ListenAndServe(portStr, nil)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
-		// go mux.Run()
-	// }
+	// mux := http.NewServeMux()
+	// err := http.ListenAndServe(portStr, mux)
+	err := http.ListenAndServe(portStr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+	// go mux.Run()
 	fmt.Println("RedisClient connection error.\n")
 }
 
@@ -62,13 +59,14 @@ func server_http_action(w http.ResponseWriter, r *http.Request) {
 	// d := r.Form["d"]
 	d := r.FormValue("d")
 	key := r.FormValue("sign")
-	if len(Params["signKey"]) > 0 && Params["signKey"] != key {
+
+	if len(Params.signKey) > 0 && Params.signKey != key {
 
 		fmt.Fprintf(w, "signKey error.")
 
 	} else {
 
-		fmt.Println(time.Now(), "body:", r.Form)
+		fmt.Println(time.Now(), "body:", r.Form, "d:", d)
 		fmt.Fprintf(w, "success.")
 	}
 

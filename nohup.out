@@ -1,0 +1,8 @@
+Run: all 
+
+map[redisdb:0 server:all port:8888 process:1 redishost:localhost:6379 redispass:] 
+
+Run: all 
+
+map[port:8888 process:1 redishost:localhost:6379 redispass: redisdb:0 server:all] 
+

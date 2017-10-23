@@ -14,16 +14,14 @@ import (
 	// "strings"
 )
 
-var Debug *bool = flag.Bool("debug", true, "Are you debug?")
+var Conf_file *string = flag.String("confile", "conf.json", "配置文件")
 var Server *string = flag.String("server", "all", "服务类型 (all/http/task/sentinel) ?")
-var Port *string = flag.String("port", "8888", "http服务端口，8888")
-var Process *string = flag.String("process", "1", "process member ?")
-var Redishost *string = flag.String("redishost", "localhost:6379", "redis ip:端口 ?")
-var Redispass *string = flag.String("redispass", "", "redis密码 ?")
-var Redisdb *string = flag.String("redisdb", "0", "redis db ?")
 
 var Args = os.Args //获取用户输入的所有参数
-var Params = make(map[string]string)
+// var Config = make(map[string]string)
+var Config *lib.Configuration
+
+// var Config *lib.Configuration = new(lib.Configuration)
 
 /**
  * main
@@ -37,14 +35,20 @@ func main() {
 
 	fmt.Println("Run:", *Server, "\n")
 
-	Params["server"] = *Server
-	Params["port"] = *Port
-	Params["process"] = *Process
-	Params["redishost"] = *Redishost
-	Params["redispass"] = ""
-	Params["redisdb"] = "0"
+	// 创建抽象对象
+	// Config = new(lib.Configuration)
 
-	fmt.Println(Params, "\n")
+	// path, err_ := lib.Get_current_path()
+	// path := Args[0]
+	// fmt.Println(path, err_, "\n")
+	// fmt.Println(Args, "\n")
+	Config.path = Args[0]
+	Config.conf_file = *Conf_file
+	Config.server = *Server
+
+	Config, _ = lib.Load_conf(Config)
+
+	fmt.Println(Config, "\n")
 
 	switch *Server {
 
@@ -52,64 +56,62 @@ func main() {
 		/**
 		 * 启动http server任务接收、后台管理web
 		 */
-		lib.Server_http(Params)
+		lib.Server_http(Config)
 
 	case "task":
 		/**
 		 * 启动脚本服务主进程
 		 */
-		lib.Server_task(Params)
+		lib.Server_task(Config)
 
-    case "sentinel":
-        /**
-         * 用于监听 
-         * 任务执行状态 业务 （供查询）
-         * 任务子进程的状态（根据pid）
-         * 
-         */
-        
-
+	case "sentinel":
+		/**
+		 * 用于监听
+		 * 任务执行状态 业务 （供查询）
+		 * 任务子进程的状态（根据pid）
+		 *
+		 */
 	case "all":
 		/**
 		 * 启动所有服务
 		 */
 
-		// path, err_ := lib.Get_current_path()
-		path := Args[0]
-		// fmt.Println(path, err_, "\n")
-		// fmt.Println(Args, "\n")
+		// run_http := fmt.Sprintf("%s %s -server=http", path, Params["paramsStr"])
+		// run_task := fmt.Sprintf("%s %s -server=task", path, Params["paramsStr"])
 
-		Params["server"] = ""
-		Params = lib.Load_json_conf(Params)
-
-		run_http := fmt.Sprintf("%s %s -server=http", path, Params["paramsStr"])
-		run_task := fmt.Sprintf("%s %s -server=task", path, Params["paramsStr"])
-
-		out_c1 := make(chan string)
-		out_c2 := make(chan string)
+		// out_c1 := make(chan string)
+		// out_c2 := make(chan string)
 		err_c1 := make(chan error)
 		err_c2 := make(chan error)
 
 		go func() {
-			out, err := lib.Run_shell(run_http)
-			out_c1 <- out
-			err_c1 <- err
+			Config.server = "http"
+			lib.Server_http(Config)
+
+			// 使用独立进程
+			// _, err := lib.Run_shell(run_http)
+			// out_c1 <- out
+			err_c1 <- nil
 		}()
 
 		go func() {
-			out, err := lib.Run_shell(run_task)
-			out_c2 <- out
-			err_c2 <- err
+			Config.server = "task"
+			lib.Server_task(Config)
+
+			// 使用独立进程
+			// _, err := lib.Run_shell(run_task)
+			// out_c2 <- out
+			err_c2 <- nil
 		}()
 
-		fmt.Println("Run http:", run_http, "\n", <-out_c1, <-err_c1, ".\n")
-		fmt.Println("Run task:", run_task, "\n", <-out_c2, <-err_c2, ".\n")
+		fmt.Println("Run http:", "\n", <-err_c1, ".\n")
+		fmt.Println("Run task:", "\n", <-err_c2, ".\n")
 	}
 
-	if *Debug == true {
-		fmt.Println("your debug is:", *Debug, "\n")
-		// fmt.Println("redis:", rClient, "\n")
-		// out, err := lib.Run_shell("ls")
-		// fmt.Println(out, "\n", err, "\n")
-	}
+	// if *Debug == true {
+	// fmt.Println("your debug is:", *Debug, "\n")
+	// fmt.Println("redis:", rClient, "\n")
+	// out, err := lib.Run_shell("ls")
+	// fmt.Println(out, "\n", err, "\n")
+	// }
 }
