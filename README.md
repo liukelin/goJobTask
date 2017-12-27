@@ -15,15 +15,23 @@
 
 现在有三种goroutine
 
-http        
-    任务接收http server
+    
+    http    
 
-task        
-    队列监控 任务消费获取 （按队列数量 多个goroutine）
-    监测新增队列并创建task
+        任务接收http server
 
-sentinel    
-    任务进程状态扫描检查 并启动
+    
+    task        
+        
+        队列监控 任务消费获取 （按队列数量 多个goroutine）
+        监测新增队列并创建task
+
+    
+    sentinel
+
+        任务进程状态扫描检查 并启动
+
+
 
 
 上传任务脚本并 配置 对应队列等参数，你所有消费机自动获取部署
