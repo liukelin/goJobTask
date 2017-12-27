@@ -5,7 +5,7 @@ package lib
 
 import (
 	"fmt"
-	"github.com/go-redis/redis"
+	// "github.com/go-redis/redis"
 	// "io/ioutil"
 	// "encoding/base64"
 	// "encoding/json"
@@ -13,37 +13,58 @@ import (
 	// "reflect"
 	// "runtime"
 	// "strconv"
-	"time"
+	// "time"
+	"goJobTask/rabbitClass"
+	"goJobTask/redisClass"
 )
-
-var RConn *redis.Client
-var Rerr error
 
 // 睡眠等等时间
 // var sleep_ int = 2
 
 /**
- * 后台脚本server 入口
+ * 启动所有服务 server 入口
  * @return {[type]} [description]
  */
-func Server_task(params *Configuration) {
+func Server_task(Config *Configuration) {
 
 	// 按CPU核数 设置并行数量
 	// runtime.GOMAXPROCS(runtime.NumCPU())
 
-	for {
+	// 获取列表 启动所有任务go
 
-		fmt.Println(time.Now(), ".\n")
+	queueName := "test_task"
 
-		// 阻塞 2s
-		// time.Sleep(time.Second * 2)
-		// time.Sleep(time.Second)
-		// time.Sleep(1000 * time.Millisecond)
-		time.Sleep(1e9) // sleep one second
+	fmt.Println("start Listening queueName.", queueName, "\n")
 
-		// 非阻塞
-		// time.After(time.Second + 10)
-		continue
-	}
+	// CommonFunc := new(CommonFunc)
+
+	
 
 }
+
+/**
+ * 启动 消费服务
+ * @param {[type]} Config *Configuration [description]
+ */
+func Start_task(config *Configuration, queueName string) bool, error {
+	// 启动服务
+	if Config.Mq == "redis" {
+
+		mqFunc := &redisClass.MqClass{Config.Redis_host, Config.Redis_port, Config.Redis_db, Config.Redis_pass}
+
+		// go func() {
+		mqFunc.Pop_data(queueName, Consu_data)
+		// redisFunc.Pop_data(queueName, CommonFunc.Consu_data)
+		// }()
+
+	} else if Config.Mq == "rabbitmq" {
+
+		mqFunc := &rabbitClass.MqClass{Config.Amqp}
+		// go func() {
+		mqFunc.Pop_data(queueName, Consu_data)
+		// }()
+
+	}
+}
+
+

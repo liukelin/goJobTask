@@ -10,31 +10,29 @@ import (
 	"log"
 	"net/http"
 	// "os"
-	"github.com/go-redis/redis"
+	// "github.com/go-redis/redis"
 	// "reflect"
 	"strconv"
 	// "strings"
 	"time"
 )
 
-var RConn0 *redis.Client
-var Rerr0 error
 var Params *Configuration
 
 /**
  * web server 入口
  * @return {[type]} [description]
  */
-func Server_http(params *Configuration) {
+func Server_http(config *Configuration) {
 
-	Params = params
+	Params = config
 
 	http.HandleFunc("/", server_http_action)
 
 	// strconv.Itoa(port)
-	portStr := ":" + strconv.Itoa(params.http_port)
+	portStr := ":" + strconv.Itoa(Params.Http_port)
 
-	fmt.Println("your portStr is:", portStr, "\n")
+	fmt.Println("Port:", portStr, ".\n")
 
 	// mux := http.NewServeMux()
 	// err := http.ListenAndServe(portStr, mux)
@@ -58,16 +56,8 @@ func server_http_action(w http.ResponseWriter, r *http.Request) {
 
 	// d := r.Form["d"]
 	d := r.FormValue("d")
-	key := r.FormValue("sign")
 
-	if len(Params.signKey) > 0 && Params.signKey != key {
-
-		fmt.Fprintf(w, "signKey error.")
-
-	} else {
-
-		fmt.Println(time.Now(), "body:", r.Form, "d:", d)
-		fmt.Fprintf(w, "success.")
-	}
+	fmt.Println(time.Now(), "body:", r.Form, "d:", d)
+	fmt.Fprintf(w, "success.")
 
 }

@@ -8,9 +8,10 @@ import (
 	"flag"
 	"fmt"
 	// "log"
+	"goJobTask/lib"
+	// "goJobTask/rabbitClass"
+	// "goJobTask/redisClass"
 	"os"
-	// "github.com/go-redis/redis"
-	lib "goJobTask/lib"
 	// "strings"
 )
 
@@ -19,9 +20,12 @@ var Server *string = flag.String("server", "all", "服务类型 (all/http/task/s
 
 var Args = os.Args //获取用户输入的所有参数
 // var Config = make(map[string]string)
+// var Config *lib.Configuration = new(*lib.Configuration)
+// var Config *lib.Configuration = &lib.Configuration{}
+// var Config *lib.Configuration
 var Config *lib.Configuration
 
-// var Config *lib.Configuration = new(lib.Configuration)
+// var MqFuncMap map[string]lib.MqFunc
 
 /**
  * main
@@ -35,20 +39,31 @@ func main() {
 
 	fmt.Println("Run:", *Server, "\n")
 
-	// 创建抽象对象
-	// Config = new(lib.Configuration)
+	// 创建抽象对象 指针
+	// Config = new(*lib.Configuration)
+	Config = new(lib.Configuration)
+	// Config * lib.Configuration = new(*lib.Configuration)
+	// Config = &lib.Configuration{}
 
-	// path, err_ := lib.Get_current_path()
-	// path := Args[0]
+	// path, _ := lib.Get_current_path()
+	path := Args[0]
 	// fmt.Println(path, err_, "\n")
 	// fmt.Println(Args, "\n")
-	Config.path = Args[0]
-	Config.conf_file = *Conf_file
-	Config.server = *Server
+	Config.Path = path
+	Config.Conf_file = *Conf_file
+	Config.Server = *Server
 
+	// 加载配置
 	Config, _ = lib.Load_conf(Config)
 
-	fmt.Println(Config, "\n")
+	fmt.Println("your conf:", Config, "\n")
+
+	// 载入MQ
+	// MqFuncMap = make(map[string]lib.MqFunc)
+	// MqFuncMap["redis"] = &redisClass.MqClass{Config.Redis_host, Config.Redis_port, Config.Redis_db, Config.Redis_pass}
+	// MqFuncMap["rabbit"] = &rabbitClass.MqClass{Config.Amqp}
+
+	// 连接MySQL
 
 	switch *Server {
 
@@ -81,37 +96,37 @@ func main() {
 
 		// out_c1 := make(chan string)
 		// out_c2 := make(chan string)
-		err_c1 := make(chan error)
-		err_c2 := make(chan error)
+		// err_c1 := make(chan error)
+		// err_c2 := make(chan error)
 
 		go func() {
-			Config.server = "http"
+			Config.Server = "http"
 			lib.Server_http(Config)
 
 			// 使用独立进程
 			// _, err := lib.Run_shell(run_http)
 			// out_c1 <- out
-			err_c1 <- nil
+			// err_c1 <- nil
 		}()
 
-		go func() {
-			Config.server = "task"
-			lib.Server_task(Config)
+		// go func() {
+		Config.Server = "task"
+		lib.Server_task(Config)
 
-			// 使用独立进程
-			// _, err := lib.Run_shell(run_task)
-			// out_c2 <- out
-			err_c2 <- nil
-		}()
+		// 使用独立进程
+		// _, err := lib.Run_shell(run_task)
+		// out_c2 <- out
+		// err_c2 <- nil
+		// }()
 
-		fmt.Println("Run http:", "\n", <-err_c1, ".\n")
-		fmt.Println("Run task:", "\n", <-err_c2, ".\n")
+		fmt.Println("Run http.", "\n", ".\n")
+		fmt.Println("Run task.", "\n", ".\n")
 	}
 
-	// if *Debug == true {
-	// fmt.Println("your debug is:", *Debug, "\n")
-	// fmt.Println("redis:", rClient, "\n")
-	// out, err := lib.Run_shell("ls")
-	// fmt.Println(out, "\n", err, "\n")
-	// }
+	if Config.Debug == true {
+		fmt.Println("your debug is:", Config.Debug, "\n")
+		// fmt.Println("redis:", rClient, "\n")
+		// out, err := lib.Run_shell("ls")
+		// fmt.Println(out, "\n", err, "\n")
+	}
 }
