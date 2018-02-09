@@ -16,9 +16,9 @@ import (
 	"strings"
 	// "runtime"
 	"bytes"
-	"strconv"
 	// "goJobTask/rabbitClass"
 	// "goJobTask/redisClass"
+	"strconv"
 )
 
 // type CallbackFunc func(string) bool
@@ -26,14 +26,14 @@ import (
 /**
  * 队列类实现方法
  */
-type MqFunc interface {
-	// 连接
-	Connect()
-	// push
-	Push_data(string, string) (bool, error)
-	// pop
-	Pop_data(string, func(string) bool)
-}
+// type MqFunc interface {
+// 	// 连接
+// 	Connect()
+// 	// push
+// 	Push_data(string, string) (bool, error)
+// 	// pop
+// 	Pop_data(string, func(string) bool)
+// }
 
 /**
  * 公共接口方法

@@ -27,7 +27,7 @@ import (
 )
 
 /**
- * 接口方法
+ * 方法
  */
 type MqClass struct {
 	Amqp string
@@ -48,6 +48,7 @@ var channel *amqp.Channel
 
 /**
  * [NewClient 创建连接]
+ * 方法实现
  * @param {[type]} ) (*redis.Client, error [description]
  */
 func (MqClass *MqClass) Connect() {

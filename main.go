@@ -109,15 +109,15 @@ func main() {
 			// err_c1 <- nil
 		}()
 
-		// go func() {
-		Config.Server = "task"
-		lib.Server_task(Config)
+		go func() {
+			Config.Server = "task"
+			lib.Server_task(Config)
 
-		// 使用独立进程
-		// _, err := lib.Run_shell(run_task)
-		// out_c2 <- out
-		// err_c2 <- nil
-		// }()
+			// 使用独立进程
+			// _, err := lib.Run_shell(run_task)
+			// out_c2 <- out
+			// err_c2 <- nil
+		}()
 
 		fmt.Println("Run http.", "\n", ".\n")
 		fmt.Println("Run task.", "\n", ".\n")

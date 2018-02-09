@@ -20,7 +20,7 @@ import (
 )
 
 /**
- * 接口方法
+ * 方法
  */
 type MqClass struct {
 	// redis
